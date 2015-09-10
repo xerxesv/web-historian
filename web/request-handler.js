@@ -41,11 +41,6 @@ exports.handleRequest = function (req, res) {
             console.log('successfully added ' + body + 'to list');
             httpHelpers.serveAssets(res, 'serving it for you soon', 302);
           });
-          
-          // htmlFetcher.toDownload.push(body);
-          // archive.downloadUrls(htmlFetcher.toDownload, function(){
-          //   console.log("downloaded");
-          // })
         }
       })
     });

@@ -64,15 +64,17 @@ exports.isUrlArchived = function(targetUrl, callback) {
 
 exports.downloadUrls = function(UrlArray, callback) {
   _.each(UrlArray, function(url) {
-    exports.isUrlArchived(url, function() {
-      console.log('working on: ' + url);
-      httpRequest.get('http://' + url, exports.paths.archivedSites + '/' + url, function(err, res) {
-        if (err) {
-          console.log(err);
-        } else {
-          console.log(res.code, res.headers, res.file);
-        }
-      })
+    exports.isUrlArchived(url, function(bool) {
+      if (!bool) {
+        console.log('working on: ' + url);
+        httpRequest.get('http://' + url, exports.paths.archivedSites + '/' + url, function(err, res) {
+          if (err) {
+            console.log(err);
+          } else {
+            console.log(res.code, res.headers, res.file);
+          }
+        });
+      }
     });
   });
   if (callback) {
