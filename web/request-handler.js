@@ -1,7 +1,7 @@
 var path = require('path');
 var archive = require('../helpers/archive-helpers');
 var httpHelpers = require('./http-helpers.js');
-var htmlFetcher = require('../workers/htmlfetcher.js');
+//var htmlFetcher = require('../workers/htmlfetcher.js');
 var fs = require('fs');
 // require more modules/folders here!
 
@@ -41,13 +41,7 @@ exports.handleRequest = function (req, res) {
             console.log('successfully added ' + body + 'to list');
             httpHelpers.serveAssets(res, 'serving it for you soon', 302);
           });
-          fs.appendFile(archive.paths.toDownload, body + '\n', function(err) {
-            if (err) {
-              console.log('writing to toDownload didn\'t work');
-            } else {
-              console.log(body + ' has been written to toDownload');
-            }
-          })
+          
           // htmlFetcher.toDownload.push(body);
           // archive.downloadUrls(htmlFetcher.toDownload, function(){
           //   console.log("downloaded");

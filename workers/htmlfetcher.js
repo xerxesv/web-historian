@@ -21,3 +21,5 @@ var fs = require('fs');
   //it calls its callback on that array
   //if there is a second callback
   //it passes the second callback as the second parameter to the first callback
+
+helpers.readListOfUrls(helpers.downloadUrls);
