@@ -31,7 +31,9 @@ exports.processUrl = function(targetUrl) {
     } else {
       console.log("successfully reading list file! data is: " + data.toString() + '*****')
       var splitData = data.toString().split('\n');
-      if (exports.isUrlInList(splitData, targetUrl)) {
+      console.log('splitdata is: ' + splitData);
+
+      if (exports.isUrlInList(splitData)) {
         if (exports.isUrlArchived(targetUrl)) {
           //serve the saved html page
         } else {
@@ -45,11 +47,35 @@ exports.processUrl = function(targetUrl) {
   });
 };
 
-exports.isUrlInList = function(list, targetUrl) {
-  // return whether 
+exports.readListOfUrls = function(callback) {
+  fs.readFile(exports.paths.list, function(err, fileContents) {
+    var splitData = fileContents.toString().split('\n');
+    callback(splitData);
+  });
 };
 
-exports.addUrlToList = function() {
+
+exports.isUrlInList = function(targetUrl, isOrIsnt) {
+  exports.readListOfUrls(function(urls){
+    if(_.contains(urls, targetUrl
+  )){
+      isOrIsnt(true);
+    }else{
+      isOrIsnt(false);
+    }
+  });
+};
+
+exports.addUrlToList = function(UrlToAdd, callback) {
+  fs.appendFile(exports.paths.list, UrlToAdd, function(err) {
+    if (err) {
+      console.log(err);
+    } else {
+      if (callback) {
+        callback();
+      }
+    }
+  });
 };
 
 exports.isUrlArchived = function(targetUrl) {
@@ -57,12 +83,3 @@ exports.isUrlArchived = function(targetUrl) {
 
 exports.downloadUrls = function(targetUrl) {
 };
-
-// exports = {
-//   initialize: initialize,
-//   processUrl: processUrl,
-//   isUrlInList: isUrlInList,
-//   addUrlToList: addUrlToList,
-//   isUrlArchived: isUrlArchived,
-//   downloadUrls: downloadUrls
-// };
