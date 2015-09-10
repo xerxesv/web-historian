@@ -18,7 +18,7 @@ var request = supertest.agent(server);
 describe("server", function() {
   describe("GET /", function () {
     it("should return the content of index.html", function (done) {
-      // just assume that if it contains an <input> tag its index.html
+      // just assume that if it contains an <input> tag it's index.html
       request
         .get('/')
         .expect(200, /<input/, done);
@@ -30,6 +30,8 @@ describe("server", function() {
       it("should return the content of a website from the archive", function (done) {
         var fixtureName = "www.google.com";
         var fixturePath = archive.paths.archivedSites + "/" + fixtureName;
+
+//        /archives/sites/www.google.com
 
         // Create or clear the file.
         var fd = fs.openSync(fixturePath, "w");

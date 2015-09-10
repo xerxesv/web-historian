@@ -24,18 +24,45 @@ exports.initialize = function(pathsObj) {
 
 // The following function names are provided to you to suggest how you might
 // modularize your code. Keep it clean!
-
-exports.readListOfUrls = function() {
+exports.processUrl = function(targetUrl) {
+  fs.readFile(exports.paths.list, function(err, data) {
+    if (err) {
+      throw err;
+    } else {
+      console.log("successfully reading list file! data is: " + data.toString() + '*****')
+      var splitData = data.toString().split('\n');
+      if (exports.isUrlInList(splitData, targetUrl)) {
+        if (exports.isUrlArchived(targetUrl)) {
+          //serve the saved html page
+        } else {
+          //return a 5xx cause we fucked up and the url is in the list but not archived
+        }
+      } else {
+        //serve the loading page
+        exports.downloadUrls(targetUrl); 
+      }
+    }
+  });
 };
 
-exports.isUrlInList = function() {
+exports.isUrlInList = function(list, targetUrl) {
+  // return whether 
 };
 
 exports.addUrlToList = function() {
 };
 
-exports.isUrlArchived = function() {
+exports.isUrlArchived = function(targetUrl) {
 };
 
-exports.downloadUrls = function() {
+exports.downloadUrls = function(targetUrl) {
 };
+
+// exports = {
+//   initialize: initialize,
+//   processUrl: processUrl,
+//   isUrlInList: isUrlInList,
+//   addUrlToList: addUrlToList,
+//   isUrlArchived: isUrlArchived,
+//   downloadUrls: downloadUrls
+// };

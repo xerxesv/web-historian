@@ -1,12 +1,19 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <link rel="stylesheet" type="text/css" href="styles.css" />
+  <!-- <link rel="stylesheet" type="text/css" href="styles.css" /> -->
 </head>
 <body>
   Enter a URL here:
-  <form method="POST">
-    <input type="input" name="url"></input>
+  <form method="POST" id="inputForm" action="">
+
+    <input type="input" id="urlInput" name="url"></input>
+    <input type="submit" value="Submit">
   </form>
+<script>
+  document.getElementById('urlInput').onchange = function(){
+      document.getElementById('inputForm').action = '/'+ this.value;
+  };
+</script>
 </body>
 </html>
