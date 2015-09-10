@@ -24,28 +24,28 @@ exports.initialize = function(pathsObj) {
 
 // The following function names are provided to you to suggest how you might
 // modularize your code. Keep it clean!
-exports.processUrl = function(targetUrl) {
-  fs.readFile(exports.paths.list, function(err, data) {
-    if (err) {
-      throw err;
-    } else {
-      console.log("successfully reading list file! data is: " + data.toString() + '*****')
-      var splitData = data.toString().split('\n');
-      console.log('splitdata is: ' + splitData);
+// exports.processUrl = function(targetUrl) {
+//   fs.readFile(exports.paths.list, function(err, data) {
+//     if (err) {
+//       throw err;
+//     } else {
+//       console.log("successfully reading list file! data is: " + data.toString() + '*****')
+//       var splitData = data.toString().split('\n');
+//       console.log('splitdata is: ' + splitData);
 
-      if (exports.isUrlInList(splitData)) {
-        if (exports.isUrlArchived(targetUrl)) {
-          //serve the saved html page
-        } else {
-          //return a 5xx cause we fucked up and the url is in the list but not archived
-        }
-      } else {
-        //serve the loading page
-        exports.downloadUrls(targetUrl); 
-      }
-    }
-  });
-};
+//       if (exports.isUrlInList(splitData)) {
+//         if (exports.isUrlArchived(targetUrl)) {
+//           //serve the saved html page
+//         } else {
+//           //return a 5xx cause we fucked up and the url is in the list but not archived
+//         }
+//       } else {
+//         //serve the loading page
+//         exports.downloadUrls(targetUrl); 
+//       }
+//     }
+//   });
+// };
 
 exports.readListOfUrls = function(callback) {
   fs.readFile(exports.paths.list, function(err, fileContents) {
@@ -57,12 +57,7 @@ exports.readListOfUrls = function(callback) {
 
 exports.isUrlInList = function(targetUrl, isOrIsnt) {
   exports.readListOfUrls(function(urls){
-    if(_.contains(urls, targetUrl
-  )){
-      isOrIsnt(true);
-    }else{
-      isOrIsnt(false);
-    }
+    _.contains(urls, targetUrl) ? isOrIsnt(true) : isOrIsnt(false);
   });
 };
 
@@ -75,10 +70,14 @@ exports.addUrlToList = function(UrlToAdd, callback) {
         callback();
       }
     }
+    // err ? console.log(err) : callback();
   });
 };
 
-exports.isUrlArchived = function(targetUrl) {
+exports.isUrlArchived = function(targetUrl, callback) {
+  fs.exists(exports.paths.archivedSites + targetUrl, function(exists) {
+    exists ? callback(true) : callback(false);
+  })
 };
 
 exports.downloadUrls = function(targetUrl) {

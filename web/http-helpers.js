@@ -10,21 +10,24 @@ exports.headers = headers = {
   'Content-Type': "text/html"
 };
 
-exports.serveAssets = function(res, asset, callback) {
-
-  fs.readFile(archive.paths.siteAssets + '/index.html', function(err, content){
-    if (err){
-      console.log("error");
-    } else{
-      callback(res, content);
-    }
-  });
-
-};
-
-exports.sendData = function(res, data) {
-  res.writeHead(200, headers);
+exports.serveAssets = function(res, data, statusCode) {
+  console.log('Serving data: ' + data);
+  res.writeHead(statusCode, headers);
   res.end(data);
 };
+
+exports.isNative = function(url) {
+  var parsed = path.parse(url);
+  console.log("is Native url: " + url + " isNative base " + parsed.base);
+  if (parsed.ext === '.com'){
+    return false;
+  }else if (parsed.base === ""){
+    return "/index.html";
+  }else {
+    return parsed.base;
+  }
+
+//  return parsed.ext === '.com' ? false : parsed.base;
+}
 
 // As you progress, keep thinking about what helper functions you can put here!
