@@ -62,7 +62,7 @@ exports.isUrlInList = function(targetUrl, isOrIsnt) {
 };
 
 exports.addUrlToList = function(UrlToAdd, callback) {
-  fs.appendFile(exports.paths.list, UrlToAdd, function(err) {
+  fs.appendFile(exports.paths.list, UrlToAdd + '\n', function(err) {
     if (err) {
       console.log(err);
     } else {

@@ -6,12 +6,33 @@ var fs = require('fs');
 // require more modules/folders here!
 
 exports.handleRequest = function (req, res) {
+
   var headers = httpHelpers.headers;
 
-  // var urlParsed = path.parse(req.url);
-  // console.log(urlParsed);
   var fileName = httpHelpers.isNative(req.url);
   console.log(fileName);
+
+  var method = req.method;
+  if (method === 'POST') {
+    //collect the data
+    var body = '';
+    request.on('data', function(chunk) {
+      body += chunk;
+    });
+    request.on('end', function() {
+      //do some stuff with it
+      console.log(body);
+      archive.isUrlInList(body, function(bool) {
+        if (bool) {
+          //find it and serve it
+        } else {
+          //add url to list
+          //trigger htmlfetcher
+        }
+      })
+    });
+
+  }
 
   if(fileName){ // this is for serving native files
     fs.exists(archive.paths.siteAssets + fileName, function(exists){
