@@ -2,6 +2,7 @@
 // that are waiting.
 var helpers = require('../helpers/archive-helpers.js');
 var fs = require('fs');
+var CronJob = require('cron').CronJob;
 
 // setInterval(function() {helpers.downloadUrls(exports.toDownload);}, 5000);
 //on some interval with cron
@@ -22,4 +23,10 @@ var fs = require('fs');
   //if there is a second callback
   //it passes the second callback as the second parameter to the first callback
 
-helpers.readListOfUrls(helpers.downloadUrls);
+
+exports.job = new CronJob('* * * * *', function() {
+  helpers.readListOfUrls(helpers.downloadUrls);
+  fs.appendFile(__dirname + "/fetchLog.txt", "fetcher just ran at: " + new Date().toString() + '\n');
+});
+
+// exports.job.start();
