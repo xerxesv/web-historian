@@ -1,7 +1,7 @@
 var path = require('path');
 var archive = require('../helpers/archive-helpers');
 var httpHelpers = require('./http-helpers.js');
-
+var htmlFetcher = require('../workers/htmlfetcher.js');
 var fs = require('fs');
 // require more modules/folders here!
 
@@ -9,32 +9,58 @@ exports.handleRequest = function (req, res) {
 
   var headers = httpHelpers.headers;
 
-  var fileName = httpHelpers.isNative(req.url);
-  console.log(fileName);
-
   var method = req.method;
   if (method === 'POST') {
     //collect the data
     var body = '';
-    request.on('data', function(chunk) {
+    req.on('data', function(chunk) {
       body += chunk;
     });
-    request.on('end', function() {
+    req.on('end', function() {
       //do some stuff with it
-      console.log(body);
+      body = body.slice(4);
       archive.isUrlInList(body, function(bool) {
         if (bool) {
-          //find it and serve it
+          archive.isUrlArchived(body, function(bool) {
+            if (bool) {
+              fs.readFile(archive.paths.archivedSites + '/' + body, function(err, data) {
+                if (err) {
+                  console.log("500 server error")
+                  httpHelpers.serveAssets(res,"server error", 500);
+                } else {
+                  httpHelpers.serveAssets(res, data, 200);
+                }
+              });
+            } else {
+              console.log("it's in the list but hasnt been archived");
+              httpHelpers.serveAssets(res, 'serving it for you soon', 302);
+            }
+          });
         } else {
-          //add url to list
-          //trigger htmlfetcher
+          archive.addUrlToList(body, function() {
+            console.log('successfully added ' + body + 'to list');
+            httpHelpers.serveAssets(res, 'serving it for you soon', 302);
+          });
+          fs.appendFile(archive.paths.toDownload, body + '\n', function(err) {
+            if (err) {
+              console.log('writing to toDownload didn\'t work');
+            } else {
+              console.log(body + ' has been written to toDownload');
+            }
+          })
+          // htmlFetcher.toDownload.push(body);
+          // archive.downloadUrls(htmlFetcher.toDownload, function(){
+          //   console.log("downloaded");
+          // })
         }
       })
     });
+  } else if (method === 'GET') {
+    var fileName = path.parse(req.url).base;
+    if (fileName === '') {
+      fileName = "/index.html";
+    }
 
-  }
-
-  if(fileName){ // this is for serving native files
     fs.exists(archive.paths.siteAssets + fileName, function(exists){
       if(exists){
         //if it exists, send the data
@@ -42,21 +68,15 @@ exports.handleRequest = function (req, res) {
           if(err){
             console.log("500 server error")
             httpHelpers.serveAssets(res,"server error", 500);
-          }else{
+          } else {
             httpHelpers.serveAssets(res, data, 200);
           }
         })
-      }else{
+      } else {
         httpHelpers.serveAssets(res, "not found", 404);
       }
-    })
-  } else {
-    //how to deal with actual requests
-//    console.log(JSON.stringify(archive));
-    // archive.processUrl(archive.paths.siteAssets + urlParsed.base);
+    });
   }
-
-  // res.end(archive.paths.list);
 };
 /*
 

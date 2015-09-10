@@ -1,6 +1,7 @@
 var fs = require('fs');
 var path = require('path');
 var _ = require('underscore');
+var httpRequest = require('../node_modules/http-request')
 
 /*
  * You will need to reuse the same paths many times over in the course of this sprint.
@@ -12,7 +13,8 @@ var _ = require('underscore');
 exports.paths = {
   siteAssets: path.join(__dirname, '../web/public'),
   archivedSites: path.join(__dirname, '../archives/sites'),
-  list: path.join(__dirname, '../archives/sites.txt')
+  list: path.join(__dirname, '../archives/sites.txt'),
+  toDownload: path.join(__dirname, '../workers/toDownload.txt')
 };
 
 // Used for stubbing paths for tests, do not modify
@@ -24,30 +26,9 @@ exports.initialize = function(pathsObj) {
 
 // The following function names are provided to you to suggest how you might
 // modularize your code. Keep it clean!
-// exports.processUrl = function(targetUrl) {
-//   fs.readFile(exports.paths.list, function(err, data) {
-//     if (err) {
-//       throw err;
-//     } else {
-//       console.log("successfully reading list file! data is: " + data.toString() + '*****')
-//       var splitData = data.toString().split('\n');
-//       console.log('splitdata is: ' + splitData);
 
-//       if (exports.isUrlInList(splitData)) {
-//         if (exports.isUrlArchived(targetUrl)) {
-//           //serve the saved html page
-//         } else {
-//           //return a 5xx cause we fucked up and the url is in the list but not archived
-//         }
-//       } else {
-//         //serve the loading page
-//         exports.downloadUrls(targetUrl); 
-//       }
-//     }
-//   });
-// };
-
-exports.readListOfUrls = function(callback) {
+exports.readListOfUrls = function(callback, path) {
+  // path = path || exports.paths.list;
   fs.readFile(exports.paths.list, function(err, fileContents) {
     var splitData = fileContents.toString().split('\n');
     callback(splitData);
@@ -75,10 +56,23 @@ exports.addUrlToList = function(UrlToAdd, callback) {
 };
 
 exports.isUrlArchived = function(targetUrl, callback) {
-  fs.exists(exports.paths.archivedSites + targetUrl, function(exists) {
+  fs.exists(exports.paths.archivedSites + '/' +targetUrl, function(exists) {
     exists ? callback(true) : callback(false);
   })
 };
 
-exports.downloadUrls = function(targetUrl) {
+exports.downloadUrls = function(UrlArray, callback) {
+  _.each(UrlArray, function(url) {
+    console.log('working on: ' + url);
+    httpRequest.get('http://' + url, exports.paths.archivedSites + '/' + url, function(err, res) {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log(res.code, res.headers, res.file);
+      }
+    });
+  });
+  if (callback) {
+    callback();
+  }
 };
